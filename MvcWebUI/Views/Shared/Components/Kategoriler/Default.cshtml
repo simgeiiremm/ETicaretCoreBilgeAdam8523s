@@ -1,0 +1,20 @@
+﻿@model List<KategoriModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="d-flex align-items-start">
+        <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <a class="nav-link" role="tab" aria-selected="true" asp-action="Index" asp-controller="Urunler">-- Tümü --</a>
+            @foreach (var kategori in Model)
+            {
+                <a class="nav-link" role="tab" aria-selected="true" asp-action="Index" asp-controller="Urunler" asp-route-Filtre.KategoriId="@kategori.Id">@kategori.Adi</a>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p class="text-danger">
+        Kategori bulunamadı!
+    </p>
+}

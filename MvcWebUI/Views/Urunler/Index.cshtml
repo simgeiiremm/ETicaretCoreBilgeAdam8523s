@@ -1,0 +1,284 @@
+﻿@*@model IEnumerable<DataAccess.Entities.Urun>*@
+@*@model IEnumerable<UrunModel>*@
+@model UrunlerIndexViewModel
+
+@{
+    ViewData["Title"] = "Ürün Listesi";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["Mesaj"] != null)
+{
+    <p class="bg-success text-white">
+        @TempData["Mesaj"]
+    </p>
+}
+
+@if (TempData["Success"] != null)
+{
+    <p class="text-success">@TempData["Success"]</p>
+}
+@if (TempData["Error"] != null)
+{
+    <p class="text-danger">@TempData["Error"]</p>
+}
+@if (TempData["SepetMessage"] != null)
+{
+    <p class="text-primary">@TempData["SepetMessage"]</p>
+}
+
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create">Yeni Ürün</a>
+    </p>
+    <hr />
+}
+
+<form asp-action="Index" method="get" id="form">
+
+    <div class="row">
+        <div class="col-2">
+            @await Component.InvokeAsync("Kategoriler")
+        </div>
+        <div class="col-10">
+
+            <div class="row" style="padding-bottom: 10px;padding-top: 10px;">
+                <div class="col-1">
+                    <label asp-for="Filtre.UrunAdi"></label>
+                </div>
+                <div class="col-3">
+                    <input asp-for="Filtre.UrunAdi" class="form-control input" />
+                </div>
+                <div class="col-1">
+                    <label asp-for="Filtre.KategoriId"></label>
+                </div>
+                <div class="col-3">
+                    <select asp-for="Filtre.KategoriId" class="form-control select2 input" asp-items="@Model.Kategoriler">
+                        <option value="">-- Tümü --</option>
+                    </select>
+                </div>
+                <div class="col-1">
+                    <label asp-for="Filtre.BirimFiyatiBaslangic"></label>
+                </div>
+                <div class="col-3">
+                    <div class="input-group">
+                        <input asp-for="Filtre.BirimFiyatiBaslangic" class="form-control input" />
+                        <span class="input-group-text">-</span>
+                        <input asp-for="Filtre.BirimFiyatiBitis" class="form-control input" />
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="padding-bottom: 10px;padding-top: 10px;">
+                <div class="col-1">
+                    <label asp-for="Filtre.StokMiktariBaslangic"></label>
+                </div>
+                <div class="col-3">
+                    <div class="input-group">
+                        <input asp-for="Filtre.StokMiktariBaslangic" class="form-control input" />
+                        <span class="input-group-text">-</span>
+                        <input asp-for="Filtre.StokMiktariBitis" class="form-control input" />
+                    </div>
+                </div>
+                <div class="col-1">
+                    <label asp-for="Filtre.MagazaIdleri"></label>
+                </div>
+                <div class="col-5">
+                    <select multiple asp-for="Filtre.MagazaIdleri" asp-items="Model.Magazalar" class="form-control select2 input"></select>
+                </div>
+            </div>
+
+            <div class="row" style="padding-bottom: 10px;">
+                <div class="col-12">
+                    @*<input type="submit" value="Ara" class="btn btn-primary" />*@
+                    <a href="" class="btn btn-primary" id="ara">Ara</a>
+                    &nbsp;&nbsp;
+                    <a class="btn btn-outline-primary" asp-action="Index">Temizle</a>
+                </div>
+            </div>
+
+            <hr />
+
+            @if (Model.ToplamKayitSayisi > 0)
+            {
+                <div class="row">
+                    <div class="col-1">
+                        <select asp-for="SayfaNo" asp-items="Model.Sayfalar" class="form-control" id="sayfa"></select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <select asp-for="Expression" asp-items="Model.Siralar" class="form-control" id="sira"></select>
+                </div>
+                <div class="col-2">
+                    <input asp-for="IsDirectionAscending"> Artan
+                </div>
+
+                <br />
+
+                <p class="bg-success text-white">@Model.ToplamKayitSayisi adet kayıt bulundu</p>
+
+                @* Model.Urunler.Count() : IEnumberable *@
+
+                <table class="table table-striped">
+                    @*<table id="urunler" class="display" style="width:100%">*@
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Urunler.FirstOrDefault().Adi)
+                            </th>
+                            @* <th>
+                                @Html.DisplayNameFor(model => model.Aciklamasi)
+                                </th>*@
+
+                            @*<th>
+                                @Html.DisplayNameFor(model => model.BirimFiyati)
+                                </th>*@
+                            <th>
+                                @Html.DisplayNameFor(model => model.Urunler.FirstOrDefault().BirimFiyatiDisplay)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(model => model.Urunler.FirstOrDefault().StokMiktari)
+                            </th>
+
+                            @*<th>
+                                @Html.DisplayNameFor(model => model.SonKullanmaTarihi)
+                                </th>*@
+                            <th>
+                                @Html.DisplayNameFor(model => model.Urunler.FirstOrDefault().SonKullanmaTarihiDisplay) (Yıl-Ay-Gün)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(model => model.Urunler.FirstOrDefault().KategoriAdiDisplay)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Urunler.FirstOrDefault().MagazaAdiDisplay)
+                            </th>
+                            @*<th>
+                                @Html.DisplayNameFor(model => model.Guid)
+                                </th>*@
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Urunler)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Adi)
+                                    @*@item.Adi*@
+                                </td>
+                                @*<td>
+                                    @Html.DisplayFor(modelItem => item.Aciklamasi)
+                                    </td>*@
+
+                                @*  <td>
+                                    @Html.DisplayFor(modelItem => item.BirimFiyati)
+                                    </td>*@
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BirimFiyatiDisplay)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StokMiktari)
+                                </td>
+
+                                @*<td>
+                                    @Html.DisplayFor(modelItem => item.SonKullanmaTarihi)
+                                    </td>*@
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SonKullanmaTarihiDisplay)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.KategoriAdiDisplay)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MagazaAdiDisplay)
+                                </td>
+                                @*<td>
+                                    @Html.DisplayFor(modelItem => item.Guid)
+                                    </td>*@
+                                <td>
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <a asp-action="Ekle" asp-controller="Home" asp-area="Sepet" asp-route-urunId="@item.Id">Sepete Ekle</a>
+
+                                        @:&nbsp;|&nbsp;
+                                        @*@:cagil@alsac.com*@
+                                        <a asp-action="Details" asp-route-id="@item.Id">Detay</a>
+
+                                        @:&nbsp;|&nbsp;
+
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
+
+                                            <text>&nbsp;|&nbsp;</text>
+
+                                            <a href="#" onclick="sil(@item.Id);">Sil</a>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-danger">Kayıt bulunamadı</p>
+            }
+        </div>
+    </div>
+
+</form>
+
+@section Scripts {
+<link rel="stylesheet" href="/lib/datatables/css/jquery.dataTables.min.css" />
+<script src="/lib/datatables/js/jquery.dataTables.min.js"></script>
+
+<link href="/lib/AlertifyJS/css/alertify.min.css" rel="stylesheet" />
+<script src="~/lib/AlertifyJS/alertify.min.js"></script>
+
+<link href="/lib/select2/css/select2.min.css" rel="stylesheet" />
+    @*<script src="~/lib/select2/js/i18n/tr.min.js"></script>*@
+<script src="~/lib/select2/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        //$('#urunler').DataTable(
+        //    {
+        //        language: {
+        //            url: "/json/datatablesTurkish.json"
+        //        }
+        //    });
+        $("#sayfa").change(function() {
+            $("#form").submit();
+        });
+        $(".select2").select2();
+        $(".input").change(function() {
+            $("#sayfa").prop("disabled", true);
+            $("#sayfa").val("1");
+        });
+        $("#ara").click(function(event) {
+            event.preventDefault();
+            $("#form").submit();
+        });
+    });
+
+    function sil(id) {
+        alertify.confirm("Uyarı!",
+            "Bu ürünü silmek istediğinize emin misiniz?",
+            function() {
+                //alertify.success('Ok');
+                window.location.href = "/Urunler/Delete/" + id;
+            },
+            function() {
+                //alertify.error('İptal');
+            }
+        ).set('labels', { ok: 'Evet', cancel: 'Hayır' });
+    }
+</script>
+}
