@@ -16,12 +16,26 @@ namespace DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Adi = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Aciklamasi = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Guid = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Aciklamasi = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Kategoriler", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Magazalar",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Adi = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    SanalMi = table.Column<bool>(type: "bit", nullable: false),
+                    Puani = table.Column<byte>(type: "tinyint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Magazalar", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -30,8 +44,7 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Adi = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Guid = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Adi = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,8 +57,7 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Adi = table.Column<string>(type: "nvarchar(105)", maxLength: 105, nullable: false),
-                    Guid = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Adi = table.Column<string>(type: "nvarchar(105)", maxLength: 105, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,7 +76,8 @@ namespace DataAccess.Migrations
                     StokMiktari = table.Column<int>(type: "int", nullable: false),
                     SonKullanmaTarihi = table.Column<DateTime>(type: "datetime2", nullable: true),
                     KategoriId = table.Column<int>(type: "int", nullable: false),
-                    Guid = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Image = table.Column<byte[]>(type: "image", nullable: true),
+                    ImageExtension = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -85,8 +98,7 @@ namespace DataAccess.Migrations
                     KullaniciAdi = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Sifre = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     AktifMi = table.Column<bool>(type: "bit", nullable: false),
-                    RolId = table.Column<int>(type: "int", nullable: false),
-                    Guid = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    RolId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,8 +117,7 @@ namespace DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Adi = table.Column<string>(type: "nvarchar(170)", maxLength: 170, nullable: false),
-                    UlkeId = table.Column<int>(type: "int", nullable: false),
-                    Guid = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UlkeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -115,6 +126,28 @@ namespace DataAccess.Migrations
                         name: "FK_Sehirler_Ulkeler_UlkeId",
                         column: x => x.UlkeId,
                         principalTable: "Ulkeler",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UrunMagazalar",
+                columns: table => new
+                {
+                    UrunId = table.Column<int>(type: "int", nullable: false),
+                    MagazaId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UrunMagazalar", x => new { x.UrunId, x.MagazaId });
+                    table.ForeignKey(
+                        name: "FK_UrunMagazalar_Magazalar_MagazaId",
+                        column: x => x.MagazaId,
+                        principalTable: "Magazalar",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UrunMagazalar_Urunler_UrunId",
+                        column: x => x.UrunId,
+                        principalTable: "Urunler",
                         principalColumn: "Id");
                 });
 
@@ -173,6 +206,11 @@ namespace DataAccess.Migrations
                 name: "IX_Urunler_KategoriId",
                 table: "Urunler",
                 column: "KategoriId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UrunMagazalar_MagazaId",
+                table: "UrunMagazalar",
+                column: "MagazaId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -181,7 +219,7 @@ namespace DataAccess.Migrations
                 name: "KullaniciDetaylari");
 
             migrationBuilder.DropTable(
-                name: "Urunler");
+                name: "UrunMagazalar");
 
             migrationBuilder.DropTable(
                 name: "Kullanicilar");
@@ -190,13 +228,19 @@ namespace DataAccess.Migrations
                 name: "Sehirler");
 
             migrationBuilder.DropTable(
-                name: "Kategoriler");
+                name: "Magazalar");
+
+            migrationBuilder.DropTable(
+                name: "Urunler");
 
             migrationBuilder.DropTable(
                 name: "Roller");
 
             migrationBuilder.DropTable(
                 name: "Ulkeler");
+
+            migrationBuilder.DropTable(
+                name: "Kategoriler");
         }
     }
 }

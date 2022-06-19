@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@AppSettings.Baslik | @ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/css/main.css" rel="stylesheet" />
 </head>
@@ -17,7 +18,7 @@
             </div>
             <ul class="list-unstyled components">
                 <li class="nav-item">
-                    <a class="a-sidebar" asp-action="Index" asp-controller="Urunler" asp-area=""> Ürünler</a>
+                    <a class="a-sidebar" asp-action="Index" asp-controller="Urunler" asp-area=""><i class="fa-solid fa-list"></i>Ürünler</a>
                 </li>
                 @if (User.Identity.IsAuthenticated)
                 {
@@ -97,6 +98,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/font-awesome/js/all.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/main.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

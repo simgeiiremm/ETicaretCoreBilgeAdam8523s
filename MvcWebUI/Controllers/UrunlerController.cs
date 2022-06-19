@@ -122,17 +122,24 @@ namespace MvcWebUI.Controllers
         //    return View(urun);
         //}
         [Authorize(Roles = "Admin")]
-        public IActionResult Create(UrunModel urun)
+        public IActionResult Create(UrunModel urun, IFormFile image)
         {
             if (ModelState.IsValid)
             {
-                var result = _urunService.Add(urun);
-                if (result.IsSuccessful)
+                if (ImajDosyasiniGuncelle(urun, image) == false)
                 {
-                    TempData["Mesaj"] = result.Message;
-                    return RedirectToAction(nameof(Index));
+                    ModelState.AddModelError("", $"Dosya yüklenemedi: Uzantılar {AppSettings.AcceptedImageExtensions} olmalı ve dosya boyutu maksiumum {AppSettings.AcceptedImageLength} MB olmalıdır!");
                 }
-                ModelState.AddModelError("", result.Message);
+                else
+                {
+                    var result = _urunService.Add(urun);
+                    if (result.IsSuccessful)
+                    {
+                        TempData["Mesaj"] = result.Message;
+                        return RedirectToAction(nameof(Index));
+                    }
+                    ModelState.AddModelError("", result.Message);
+                }
             }
             ViewData["KategoriId"] = new SelectList(_kategoriService.Query().ToList(), "Id", "Adi", urun.KategoriId);
             return View(urun);
@@ -183,19 +190,72 @@ namespace MvcWebUI.Controllers
         //    return View(urun);
         //}
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(UrunModel urun)
+        public IActionResult Edit(UrunModel urun, IFormFile image)
         {
             if (ModelState.IsValid)
             {
-                var result = _urunService.Update(urun);
-                if (result.IsSuccessful)
-                    //return Redirect("https://bilgeadam.com");
-                    return RedirectToAction(nameof(Index));
-                ModelState.AddModelError("", result.Message);
+                if (ImajDosyasiniGuncelle(urun, image) == false)
+                {
+                    ModelState.AddModelError("", $"Dosya yüklenemedi: Uzantılar {AppSettings.AcceptedImageExtensions} olmalı ve dosya boyutu maksiumum {AppSettings.AcceptedImageLength} MB olmalıdır!");
+                }
+                else
+                {
+                    var result = _urunService.Update(urun);
+                    if (result.IsSuccessful)
+                        //return Redirect("https://bilgeadam.com");
+                        return RedirectToAction(nameof(Index));
+                    ModelState.AddModelError("", result.Message);
+                }
             }
             ViewBag.KategoriId = new SelectList(_kategoriService.Query().ToList(), "Id", "Adi", urun.KategoriId);
             return View(urun);
         }
+        private bool? ImajDosyasiniGuncelle(UrunModel model, IFormFile yuklenenImaj)
+        {
+            #region Dosya validasyonu
+            bool? sonuc = null;
+            string yuklenenDosyaAdi = null, yuklenenDosyaUzantisi = null;
+            if (yuklenenImaj != null && yuklenenImaj.Length > 0) // yüklenen imaj verisi varsa
+            {
+                sonuc = false; // validasyonu geçemedi ilk değer ataması
+                yuklenenDosyaAdi = yuklenenImaj.FileName; // asusrog.jpg
+                yuklenenDosyaUzantisi = Path.GetExtension(yuklenenDosyaAdi); // .jpg
+                string[] imajDosyaUzantilari = AppSettings.AcceptedImageExtensions.Split(',');
+                foreach (string imajDosyaUzantisi in imajDosyaUzantilari)
+                {
+                    if (yuklenenDosyaUzantisi.ToLower() == imajDosyaUzantisi.ToLower().Trim())
+                    {
+                        sonuc = true; // imaj uzantısı validasyonunu geçti
+                        break;
+                    }
+                }
+                if (sonuc == true) // eğer imaj uzantısı validasyonunu geçtiyse imaj boyutunu valide edelim
+                {
+                    // 1 byte = 8 bits
+                    // 1 kilobyte = 1024 bytes
+                    // 1 megabyte = 1024 kilobytes = 1024 * 1024 bytes = 1.048.576 bytes
+                    double imajDosyaBoyutu = AppSettings.AcceptedImageLength * Math.Pow(1024, 2); // bytes
+                    if (yuklenenImaj.Length > imajDosyaBoyutu)
+                        sonuc = false; // imaj boyutu validasyonunu geçemedi
+                }
+            }
+            #endregion
+
+            #region Dosyanın kaydedilmesi
+            if (sonuc == true)
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    yuklenenImaj.CopyTo(memoryStream);
+                    model.Image = memoryStream.ToArray();
+                    model.ImageExtension = yuklenenDosyaUzantisi;
+                }
+            }
+            #endregion
+
+            return sonuc;
+        }
+
 
         // GET: Urunler/Delete/5
         //[Authorize(Roles = "Admin")]
@@ -214,6 +274,11 @@ namespace MvcWebUI.Controllers
             else
                 TempData["Error"] = result.Message;
             return RedirectToAction(nameof(Index));
+        }
+        public IActionResult DeleteImage(int urunId)
+        {
+            _urunService.DeleteImage(urunId);
+            return RedirectToAction(nameof(Details), new {id = urunId});
         }
 	}
 }

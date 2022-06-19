@@ -17,7 +17,7 @@ namespace DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.4")
+                .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -38,12 +38,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Guid")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Kategoriler", (string)null);
+                    b.ToTable("Kategoriler");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Kullanici", b =>
@@ -56,9 +53,6 @@ namespace DataAccess.Migrations
 
                     b.Property<bool>("AktifMi")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Guid")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("KullaniciAdi")
                         .IsRequired()
@@ -77,7 +71,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("RolId");
 
-                    b.ToTable("Kullanicilar", (string)null);
+                    b.ToTable("Kullanicilar");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.KullaniciDetayi", b =>
@@ -109,7 +103,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UlkeId");
 
-                    b.ToTable("KullaniciDetaylari", (string)null);
+                    b.ToTable("KullaniciDetaylari");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Magaza", b =>
@@ -125,9 +119,6 @@ namespace DataAccess.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("Guid")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<byte?>("Puani")
                         .HasColumnType("tinyint");
 
@@ -136,7 +127,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Magazalar", (string)null);
+                    b.ToTable("Magazalar");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Rol", b =>
@@ -152,12 +143,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("Guid")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Roller", (string)null);
+                    b.ToTable("Roller");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Sehir", b =>
@@ -173,9 +161,6 @@ namespace DataAccess.Migrations
                         .HasMaxLength(170)
                         .HasColumnType("nvarchar(170)");
 
-                    b.Property<string>("Guid")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("UlkeId")
                         .HasColumnType("int");
 
@@ -183,7 +168,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UlkeId");
 
-                    b.ToTable("Sehirler", (string)null);
+                    b.ToTable("Sehirler");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Ulke", b =>
@@ -199,12 +184,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(105)
                         .HasColumnType("nvarchar(105)");
 
-                    b.Property<string>("Guid")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Ulkeler", (string)null);
+                    b.ToTable("Ulkeler");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Urun", b =>
@@ -227,8 +209,12 @@ namespace DataAccess.Migrations
                     b.Property<double>("BirimFiyati")
                         .HasColumnType("float");
 
-                    b.Property<string>("Guid")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("image");
+
+                    b.Property<string>("ImageExtension")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<int>("KategoriId")
                         .HasColumnType("int");
@@ -243,7 +229,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("KategoriId");
 
-                    b.ToTable("Urunler", (string)null);
+                    b.ToTable("Urunler");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.UrunMagaza", b =>
@@ -260,7 +246,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("MagazaId");
 
-                    b.ToTable("UrunMagazalar", (string)null);
+                    b.ToTable("UrunMagazalar");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Kullanici", b =>
