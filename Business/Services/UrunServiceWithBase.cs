@@ -74,6 +74,7 @@ namespace Business.Services
             //}
 
             Repo.Add(entity);
+            model.Id = entity.Id;
             return new SuccessResult("Ürün başarıyla eklendi.");
         }
 
